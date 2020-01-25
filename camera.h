@@ -8,6 +8,5 @@ Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, const Sphere &sphere) {
     if (!sphere.ray_intersect(orig, dir, sphere_dist)) {
         return Vec3f(0.2, 0.7, 0.8);
     }
-    std::cout << "-----" << std::endl;
     return Vec3f(0.4, 0.4, 0.3);
 }

@@ -8,12 +8,11 @@
 #include "sphere.h"
 #include "camera.h"
 
-void render(Sphere & sphere) {
+void render(Sphere & sphere, float fov) {
     const int width = 1024;
     const int height = 768;
-
+    
     std::vector<Vec3f> framebuffer(width * height);
-    float fov = 50;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             float x = (2 * (j + 0.5) / (float)width - 1) * tan(fov / 2.) * width / (float)height;
@@ -39,7 +38,8 @@ void render(Sphere & sphere) {
 
 
 int main() {
-    Sphere sphere(Vec3f(500, 200, 100), 20);
-    render(sphere);
+    Sphere sphere(Vec3f(500, 200, -500), 30);
+    float fov = 80;
+    render(sphere, fov);
     return 0;
 }

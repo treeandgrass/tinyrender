@@ -1,6 +1,7 @@
 #ifndef _SPHERE_H_
 #define _SPHERE_H_
 #include<cmath>
+#include<iostream>
 #include "geometry.h"
 
 struct Sphere {
@@ -18,7 +19,6 @@ struct Sphere {
         float pi = sqrtf(radius * radius - D);
         t0 = tca - pi;
         float t1 = tca + pi;
-
         if (t0 < 0) t0 = t1;
         if (t0 < 0) return false;
         return true;
