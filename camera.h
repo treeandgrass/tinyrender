@@ -9,9 +9,7 @@
 #include "material.h"
 
 class Camera {
-    public: Camera(std::vector<Light> &lights): lights(lights) {}
-    public:
-        std::vector<Light> lights;
+    public: Camera() {}
 
     public:
         bool scene_intersect(const Vec3f orig, const Vec3f dir, std::vector<Sphere> spheres, Vec3f &hit, Vec3f &N, Material &material, float limit) {
@@ -29,7 +27,7 @@ class Camera {
             return sphere_dist <= limit ? true : false;
         }
 
-        Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, std::vector<Sphere> &spheres) {
+        Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, std::vector<Sphere> &spheres, std::vector<Light> lights) {
             const float limit = 1000;
 
             Vec3f N, hit;
@@ -39,7 +37,13 @@ class Camera {
                 return Vec3f(0.4, 0.5, 0.6);
             }
 
-            return material.diffuse_color;
+            int intensity = 0;
+            for (size_t i = 0; i < lights.size(); i++) {
+                Vec3f light_dir = (lights[i].position - hit).normalize();
+                intensity += lights[i].intensity * std::max(0.f, N * light_dir);
+            }
+
+            return material.diffuse_color * intensity;
         }
     
 };

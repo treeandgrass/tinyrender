@@ -26,7 +26,7 @@ int main() {
     lights.push_back(Light(Vec3f( 30, 20,  30), 1.7));
 
     // camera
-    Camera camera(lights);
+    Camera camera;
 
     std::vector<Sphere> spheres;
     spheres.push_back(Sphere(Vec3f(-3,    0,   -16), 2,      ivory));
@@ -34,7 +34,7 @@ int main() {
     spheres.push_back(Sphere(Vec3f( 1.5, -0.5, -18), 3, red_rubber));
     spheres.push_back(Sphere(Vec3f( 7,    5,   -18), 4,     mirror));
     // run
-    render(spheres, 80, camera);
+    render(spheres, 80, camera, lights);
 
     return 0;
 }

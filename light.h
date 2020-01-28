@@ -5,9 +5,10 @@
 
 struct Light {
     Light() {};
-    Light(const Vec3f &p, const float i): position(p), itensity(i) {}
+    Light(const Vec3f &p, const float i): position(p), intensity(i) {}
+
     Vec3f position;
-    float itensity;
+    float intensity;
 };
 
 #endif
