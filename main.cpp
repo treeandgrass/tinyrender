@@ -10,7 +10,7 @@
 #include "light.h"
 
 
-void render(Sphere & sphere, float fov, Camera &camera) {
+void render(std::vector<Sphere> & spheres, float fov, Camera &camera) {
     const int width = 1024;
     const int height = 768;
 
@@ -20,7 +20,7 @@ void render(Sphere & sphere, float fov, Camera &camera) {
             float x = (2 * (j + 0.5) / (float)width - 1) * tan(fov / 2.) * width / (float)height;
             float y = -(2 * (i + 0.5) / (float)height - 1) * tan(fov / 2.);
             Vec3f dir = Vec3f(x, y, -1).normalize();
-            framebuffer[j + i * width] = camera.cast_ray(Vec3f(0., 0., 0.), dir, sphere);
+            framebuffer[j + i * width] = camera.cast_ray(Vec3f(0., 0., 0.), dir, spheres);
         }
     }
 
@@ -50,8 +50,13 @@ int main() {
     }
 
     Camera camera(lights);
-    Sphere sphere(Vec3f(500, 200, -500), 30);
 
-    render(sphere, fov, camera);
+    std::vector<Sphere> spheres;
+    int spehre_num = 4;
+    for (size_t i = 0; i < spehre_num; i++) {
+        spheres.push_back(Sphere(Vec3f(i * 6, i * 8, i * (-10)), i * 5));
+    }
+
+    render(spheres, fov, camera);
     return 0;
 }
