@@ -3,12 +3,14 @@
 #include<cmath>
 #include<iostream>
 #include "geometry.h"
+#include "material.h"
 
 struct Sphere {
+    Material material;
     Vec3f center;
     float radius;
 
-    Sphere(const Vec3f &c, const float &r): center(c), radius(r) {}
+    Sphere(const Vec3f &c, const float &r, Material &material): material(material), center(c), radius(r) {}
 
     bool ray_intersect(const Vec3f &orig, const Vec3f &dir, float &t0) const {
         Vec3f L = center - orig;

@@ -6,6 +6,7 @@
 #include "geometry.h"
 #include "sphere.h"
 #include "light.h"
+#include "material.h"
 
 class Camera {
     public: Camera(std::vector<Light> &lights): lights(lights) {}
@@ -13,37 +14,32 @@ class Camera {
         std::vector<Light> lights;
 
     public:
-        Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, std::vector<Sphere> &spheres) {
+        bool scene_intersect(const Vec3f orig, const Vec3f dir, std::vector<Sphere> spheres, Vec3f &hit, Vec3f &N, Material &material, float limit) {
             float sphere_dist = std::numeric_limits<float>::max();
-            size_t hit_index = -1;
-            
             for (size_t i = 0; i < spheres.size(); i++) {
-                float s_dist = std::numeric_limits<float>::max();
-                if (spheres[i].ray_intersect(orig, dir, s_dist) && s_dist < sphere_dist) {
-                    sphere_dist = s_dist;
-                    hit_index = i;
+                float ray_dist = std::numeric_limits<float>::max();
+                if (spheres[i].ray_intersect(orig, dir, ray_dist) && ray_dist < sphere_dist) {
+                    sphere_dist = ray_dist;
+                    hit = orig + dir * sphere_dist;
+                    N = (hit - spheres[i].center).normalize();
+                    material = spheres[i].material;
                 }
             }
 
-            if (hit_index < 0) {
-                return Vec3f(0.2, 0.7, 0.8);
-            }
-            std::cout << hit_index << std::endl;
+            return sphere_dist <= limit ? true : false;
+        }
 
-            Vec3f hit = orig + dir * sphere_dist;
-            const Vec3f N = (hit - spheres[hit_index].center).normalize();
-            // color
-            const Vec3f material_color(0.3, 0.4, 0.5);
-            int intensity = 0;
+        Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, std::vector<Sphere> &spheres) {
+            const float limit = 1000;
 
+            Vec3f N, hit;
+            Material material;
 
-            for (size_t i = 0; i < lights.size(); i++) {
-                Light light = lights[i];
-                Vec3f light_dir = (hit - light.position).normalize();
-                intensity += light.itensity * std::max(0.f, light_dir * N);
+            if (!scene_intersect(orig, dir, spheres, hit, N, material, limit)) {
+                return Vec3f(0.4, 0.5, 0.6);
             }
 
-            return material_color * intensity;
+            return material.diffuse_color;
         }
     
 };
