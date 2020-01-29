@@ -81,4 +81,9 @@ template <size_t DIM, typename T> std::ostream& operator<<(std::ostream& out, co
     }
     return out ;
 }
+
+Vec3f reflect(const Vec3f &I, const Vec3f &N) {
+    return I - N * 2 * (N * I);
+}
+
 #endif //__GEOMETRY_H__

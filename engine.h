@@ -26,6 +26,9 @@ void render(std::vector<Sphere> &spheres, float fov, Camera &camera, std::vector
     ofs << "P6\n" << width << " " << height << "\n255\n";
     size_t len = width * height;
     for (size_t i = 0; i < len; i++ ) {
+        Vec3f &color = framebuffer[i];
+        float max = std::max(color[0], std::max(color[1], color[2]));
+        if (max > 1) color = color * (1 / max);
         for (size_t j = 0; j < 3; j++) {
             ofs << (char) (255 * std::max(0.f, std::min(1.f, framebuffer[i][j])));
         }
