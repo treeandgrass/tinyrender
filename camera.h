@@ -37,7 +37,7 @@ class Camera {
                 return Vec3f(0.4, 0.5, 0.6);
             }
 
-            int light_intensity = 0;
+            float diffuse_light_intensity = 0, specular_light_intensity = 0;
             for (size_t i = 0; i < lights.size(); i++) {
                 Vec3f shadow_N, shadow_hit;
                 Material shadow_material;
@@ -48,11 +48,12 @@ class Camera {
                 if (scene_intersect(shadow_orig, light_dir, spheres, shadow_hit, shadow_N, shadow_material, limit) && (shadow_hit - shadow_orig).norm() < light_distance )
                     continue;
 
-                light_intensity += lights[i].intensity * std::max(0.f, N * light_dir);
-                light_intensity += lights[i].intensity * std::max(0.f, reflect(light_dir, N) * dir) * material.specular_exponent;
+                diffuse_light_intensity += lights[i].intensity * std::max(0.f, N * light_dir);
+                specular_light_intensity += lights[i].intensity * powf(std::max(0.f, reflect(light_dir, N) * dir),  material.specular_exponent);
             }
 
-            return material.diffuse_color * light_intensity;
+            return material.diffuse_color * diffuse_light_intensity * material.albedo[0] + Vec3f(1., 1., 1.) * specular_light_intensity * material.albedo[1];
+
         }
     
 };
