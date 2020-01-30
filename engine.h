@@ -16,7 +16,7 @@ void render(std::vector<Sphere> &spheres, float fov, Camera &camera, std::vector
             float x = (2 * (j + 0.5) / (float)width - 1) * tan(fov / 2.) * width / (float)height;
             float y = -(2 * (i + 0.5) / (float)height - 1) * tan(fov / 2.);
             Vec3f dir = Vec3f(x, y, -1).normalize();
-            framebuffer[j + i * width] = camera.cast_ray(Vec3f(0., 0., 0.), dir, spheres, lights);
+            framebuffer[j + i * width] = camera.cast_ray(Vec3f(0., 0., 0.), dir, spheres, lights, 1);
         }
     }
 

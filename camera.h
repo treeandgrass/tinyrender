@@ -27,15 +27,19 @@ class Camera {
             return sphere_dist <= limit ? true : false;
         }
 
-        Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, std::vector<Sphere> &spheres, std::vector<Light> lights) {
+        Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, std::vector<Sphere> &spheres, std::vector<Light> lights, size_t depth) {
             const float limit = 1000;
 
             Vec3f N, hit;
             Material material;
 
-            if (!scene_intersect(orig, dir, spheres, hit, N, material, limit)) {
+            if (depth > 4 || !scene_intersect(orig, dir, spheres, hit, N, material, limit)) {
                 return Vec3f(0.4, 0.5, 0.6);
             }
+
+            Vec3f reflect_dir = reflect(dir, N);
+            Vec3f reflect_orig = N * reflect_dir < 0 ? hit - N * 1e-3 : hit + N * 1e-3;
+            Vec3f reflect_color = cast_ray(reflect_orig, reflect_dir, spheres, lights, depth + 1);
 
             float diffuse_light_intensity = 0, specular_light_intensity = 0;
             for (size_t i = 0; i < lights.size(); i++) {
@@ -52,7 +56,7 @@ class Camera {
                 specular_light_intensity += lights[i].intensity * powf(std::max(0.f, reflect(light_dir, N) * dir),  material.specular_exponent);
             }
 
-            return material.diffuse_color * diffuse_light_intensity * material.albedo[0] + Vec3f(1., 1., 1.) * specular_light_intensity * material.albedo[1];
+            return material.diffuse_color * diffuse_light_intensity * material.albedo[0] + Vec3f(1., 1., 1.) * specular_light_intensity * material.albedo[1] + reflect_color * material.albedo[2];
 
         }
     
