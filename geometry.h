@@ -13,10 +13,6 @@ private:
     T data_[DIM];
 };
 
-typedef vec<2, float> Vec2f;
-typedef vec<3, float> Vec3f;
-typedef vec<3, int  > Vec3i;
-typedef vec<4, float> Vec4f;
 
 template <typename T> struct vec<2,T> {
     vec() : x(T()), y(T()) {}
@@ -76,14 +72,25 @@ template <typename T> vec<3,T> cross(vec<3,T> v1, vec<3,T> v2) {
 }
 
 template <size_t DIM, typename T> std::ostream& operator<<(std::ostream& out, const vec<DIM,T>& v) {
-    for(unsigned int i=0; i<DIM; i++) {
-        out << v[i] << " " ;
-    }
+    for(unsigned int i=0; i<DIM; i++) out << v[i] << " " ;
     return out ;
 }
 
+typedef vec<2, float> Vec2f;
+typedef vec<3, float> Vec3f;
+typedef vec<3, int  > Vec3i;
+typedef vec<4, float> Vec4f;
+
 Vec3f reflect(const Vec3f &I, const Vec3f &N) {
     return I - N * 2 * (N * I);
+}
+
+Vec3f refract(const Vec3f &L, const Vec3f &N, float t, float l = 1.0f) {
+    float cosi = - std::max(-1.f, std::min(1.f, N * L));
+    if (cosi < 0) return refract(L, -N, l, t);
+    float lbyt = l / t;
+    float M = 1 - lbyt * lbyt * (1 - cosi * cosi);
+    return M < 0 ? Vec3f(1, 0, 0) : N * (lbyt * cosi - sqrtf(M)) + L * lbyt;
 }
 
 #endif //__GEOMETRY_H__

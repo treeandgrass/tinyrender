@@ -24,7 +24,20 @@ class Camera {
                 }
             }
 
-            return sphere_dist <= limit ? true : false;
+            float checkerboard_dist = std::numeric_limits<float>::max();
+            
+            if (fabs(dir.y)>1e-3)  {
+                float d = -(orig.y+4)/dir.y; // the checkerboard plane has equation y = -4
+                Vec3f pt = orig + dir*d;
+                if (d > 0 && fabs(pt.x)<10 && pt.z < -10 && pt.z > -30 && d < sphere_dist) {
+                    checkerboard_dist = d;
+                    hit = pt;
+                    N = Vec3f(0,1,0);
+                    material.diffuse_color = (int(.5*hit.x+1000) + int(.5*hit.z)) & 1 ? Vec3f(1,1,1) : Vec3f(1, .7, .3);
+                    material.diffuse_color = material.diffuse_color*.3;
+                }
+            }
+            return std::min(sphere_dist, checkerboard_dist) < limit;
         }
 
         Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, std::vector<Sphere> &spheres, std::vector<Light> lights, size_t depth) {
@@ -38,8 +51,13 @@ class Camera {
             }
 
             Vec3f reflect_dir = reflect(dir, N);
+            Vec3f refract_dir = refract(dir, N, material.refractive_index);
+
             Vec3f reflect_orig = N * reflect_dir < 0 ? hit - N * 1e-3 : hit + N * 1e-3;
+            Vec3f refract_orig = N * refract_dir < 0 ? hit - N * 1e-3 : hit + N * 1e-3;
+
             Vec3f reflect_color = cast_ray(reflect_orig, reflect_dir, spheres, lights, depth + 1);
+            Vec3f refract_color = cast_ray(refract_orig, refract_dir, spheres, lights, depth);
 
             float diffuse_light_intensity = 0, specular_light_intensity = 0;
             for (size_t i = 0; i < lights.size(); i++) {
@@ -56,8 +74,7 @@ class Camera {
                 specular_light_intensity += lights[i].intensity * powf(std::max(0.f, reflect(light_dir, N) * dir),  material.specular_exponent);
             }
 
-            return material.diffuse_color * diffuse_light_intensity * material.albedo[0] + Vec3f(1., 1., 1.) * specular_light_intensity * material.albedo[1] + reflect_color * material.albedo[2];
-
+            return material.diffuse_color * diffuse_light_intensity * material.albedo[0] + Vec3f(1., 1., 1.) * specular_light_intensity * material.albedo[1] + reflect_color * material.albedo[2] + refract_color * material.albedo[3];
         }
     
 };
