@@ -33,7 +33,7 @@ class Camera {
                     N = Vec3f(0, 1, 0);
                     checkerboard_dist = d;
 
-                    material.diffuse_color = (int(0.5 * hit.x + 1000) + int(0.5 * pt.z)) & 1 ? Vec3f(1, 1, 1) : Vec3f(1, .7, .3);
+                    material.diffuse_color = (int(0.5 * hit.x) + int(0.5 * pt.z)) & 1 ? Vec3f(1, 1, 1) : Vec3f(1, .7, .3);
                     material.diffuse_color = material.diffuse_color * 0.3;
                 }
             }
