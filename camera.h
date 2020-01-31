@@ -25,16 +25,16 @@ class Camera {
             }
 
             float checkerboard_dist = std::numeric_limits<float>::max();
-            
-            if (fabs(dir.y)>1e-3)  {
-                float d = -(orig.y+4)/dir.y; // the checkerboard plane has equation y = -4
-                Vec3f pt = orig + dir*d;
-                if (d > 0 && fabs(pt.x)<10 && pt.z < -10 && pt.z > -30 && d < sphere_dist) {
-                    checkerboard_dist = d;
+            if (dir.y < -1e-3) {
+                float d = -(4 + orig.y) / dir.y;
+                Vec3f pt = orig + dir * d;
+                if (d > 0 && fabs(pt.x) < 10 && pt.z < -10 && pt.z > -30 && d < sphere_dist) {
                     hit = pt;
-                    N = Vec3f(0,1,0);
-                    material.diffuse_color = (int(.5*hit.x+1000) + int(.5*hit.z)) & 1 ? Vec3f(1,1,1) : Vec3f(1, .7, .3);
-                    material.diffuse_color = material.diffuse_color*.3;
+                    N = Vec3f(0, 1, 0);
+                    checkerboard_dist = d;
+
+                    material.diffuse_color = (int(0.5 * hit.x + 1000) + int(0.5 * pt.z)) & 1 ? Vec3f(1, 1, 1) : Vec3f(1, .7, .3);
+                    material.diffuse_color = material.diffuse_color * 0.3;
                 }
             }
             return std::min(sphere_dist, checkerboard_dist) < limit;
